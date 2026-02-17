@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AA Maker - 2ch風アスキーアート生成</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 左パネル: ツール・設定 -->
+  <div id="left-panel">
+    <h1 class="app-title">AA Maker</h1>
+    <p class="app-subtitle">2ch風アスキーアート生成</p>
+
+    <!-- モード切替 -->
+    <div class="section">
+      <div class="mode-tabs">
+        <button id="mode-upload" class="mode-btn active">画像アップロード</button>
+        <button id="mode-draw" class="mode-btn">手描き</button>
+      </div>
+    </div>
+
+    <!-- アップロードセクション -->
+    <div id="upload-section" class="section">
+      <input type="file" id="file-input" accept="image/*" hidden>
+      <label for="file-input" class="upload-label">
+        <span class="upload-icon">+</span>
+        <span>画像を選択</span>
+      </label>
+    </div>
+
+    <!-- 描画ツール (手描きモード時表示) -->
+    <div id="draw-tools" class="section" style="display:none;">
+      <h3 class="section-title">描画ツール</h3>
+      <div class="tool-row">
+        <button id="tool-brush" class="tool-btn active">ブラシ</button>
+        <button id="tool-eraser" class="tool-btn">消しゴム</button>
+        <button id="clear-canvas" class="tool-btn tool-btn-danger">クリア</button>
+      </div>
+      <div class="control-group">
+        <label class="control-label">
+          ブラシサイズ
+          <span class="control-value" id="brush-size-val">5</span>
+        </label>
+        <input type="range" id="brush-size" min="1" max="30" value="5" class="slider">
+      </div>
+    </div>
+
+    <!-- 出力設定 -->
+    <div class="section">
+      <h3 class="section-title">出力設定</h3>
+      <div class="control-group control-group-row">
+        <div class="control-half">
+          <label class="control-label">横幅 (列)</label>
+          <input type="number" id="output-cols" value="80" min="10" max="300" class="number-input">
+        </div>
+        <div class="control-half">
+          <label class="control-label">高さ (行)</label>
+          <input type="number" id="output-rows" value="40" min="5" max="150" class="number-input">
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="keep-aspect"> アスペクト比を維持
+        </label>
+      </div>
+    </div>
+
+    <!-- 画像調整 -->
+    <div class="section">
+      <h3 class="section-title">画像調整</h3>
+      <div class="control-group">
+        <label class="control-label">
+          明るさ
+          <span class="control-value" id="brightness-val">0</span>
+        </label>
+        <input type="range" id="brightness" min="-100" max="100" value="0" class="slider">
+      </div>
+      <div class="control-group">
+        <label class="control-label">
+          コントラスト
+          <span class="control-value" id="contrast-val">0</span>
+        </label>
+        <input type="range" id="contrast" min="-100" max="100" value="0" class="slider">
+      </div>
+    </div>
+
+    <!-- 変換オプション -->
+    <div class="section">
+      <h3 class="section-title">変換オプション</h3>
+      <div class="control-group">
+        <label class="control-label">変換モード</label>
+        <div class="mode-tabs" style="margin-bottom: 8px;">
+          <button id="conv-density" class="mode-btn active" data-mode="density">濃度</button>
+          <button id="conv-shape" class="mode-btn" data-mode="shape">形状</button>
+          <button id="conv-hybrid" class="mode-btn" data-mode="hybrid">ハイブリッド</button>
+          <button id="conv-outline" class="mode-btn" data-mode="outline">輪郭のみ</button>
+        </div>
+        <p class="control-hint" id="conv-mode-hint">ピクセルの明暗で文字を選択</p>
+      </div>
+      <div class="control-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="edge-detection"> エッジ検出
+        </label>
+      </div>
+      <div class="control-group">
+        <label class="control-label">
+          エッジ閾値
+          <span class="control-value" id="edge-threshold-val">50</span>
+        </label>
+        <input type="range" id="edge-threshold" min="0" max="255" value="50" class="slider" disabled>
+      </div>
+      <div class="control-group">
+        <label class="control-label">文字幅</label>
+        <div class="mode-tabs" style="margin-bottom: 0;">
+          <button id="width-half" class="mode-btn active" data-width="half">半角</button>
+          <button id="width-full" class="mode-btn" data-width="full">全角</button>
+          <button id="width-mixed" class="mode-btn" data-width="mixed">混在</button>
+        </div>
+      </div>
+      <div class="control-group">
+        <label class="checkbox-label">
+          <input type="checkbox" id="invert"> 白黒反転
+        </label>
+      </div>
+    </div>
+
+    <!-- 高度な設定 -->
+    <div class="section">
+      <h3 class="section-title">高度な設定</h3>
+      <div class="control-group">
+        <label class="control-label">
+          ガウシアンブラー
+          <span class="control-value" id="gaussian-blur-val">0</span>
+        </label>
+        <input type="range" id="gaussian-blur" min="0" max="2" value="0" class="slider">
+      </div>
+      <div class="control-group">
+        <label class="control-label">
+          ディザリング
+          <span class="control-value" id="dithering-val">OFF</span>
+        </label>
+        <input type="range" id="dithering" min="0" max="16" value="0" class="slider">
+      </div>
+    </div>
+  </div>
+
+  <!-- 中央パネル: キャンバス / 画像プレビュー -->
+  <div id="center-panel">
+    <div id="drop-zone">
+      <div class="drop-zone-content">
+        <div class="drop-zone-icon">&#x1f5bc;</div>
+        <p>画像をドラッグ＆ドロップ</p>
+        <p class="drop-zone-sub">または左パネルからアップロード</p>
+      </div>
+    </div>
+    <canvas id="preview-canvas" style="display:none;"></canvas>
+    <canvas id="draw-canvas" style="display:none;"></canvas>
+  </div>
+
+  <!-- 右パネル: AAプレビュー -->
+  <div id="right-panel">
+    <div class="panel-header">
+      <h3>AAプレビュー</h3>
+      <div class="preview-controls">
+        <button id="toggle-bg" class="toggle-bg-btn" title="背景色切替">☀</button>
+        <label class="control-label" style="margin-right:8px;">
+          フォントサイズ
+          <span class="control-value" id="font-size-val">12</span>
+        </label>
+        <input type="range" id="font-size" min="4" max="24" value="12" class="slider slider-small">
+      </div>
+    </div>
+    <div id="aa-output-wrapper">
+      <pre id="aa-output">ここにAAが表示されます</pre>
+    </div>
+    <div id="output-actions">
+      <button id="copy-btn" class="action-btn">
+        コピー
+      </button>
+      <button id="export-btn" class="action-btn">
+        エクスポート (.txt)
+      </button>
+    </div>
+  </div>
+
+  <!-- 非表示ワークキャンバス -->
+  <canvas id="work-canvas" style="display:none;"></canvas>
+  <canvas id="resize-canvas" style="display:none;"></canvas>
+
+  <script src="characters.js"></script>
+  <script src="converter.js"></script>
+  <script src="canvas-draw.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
